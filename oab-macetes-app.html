@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>199 Macetes OAB</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:16px}
+.app{width:100%;max-width:430px;background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:16px;overflow:hidden;min-height:90vh;display:flex;flex-direction:column;box-shadow:0 4px 24px rgba(0,0,0,0.08)}
+.screen{display:none;flex-direction:column;flex:1;min-height:0}
+.screen.active{display:flex}
+.hdr{padding:13px 15px 11px;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;background:#fff}
+.hdr-row{display:flex;align-items:center;gap:9px}
+.back-btn{background:none;border:1px solid rgba(0,0,0,0.12);border-radius:8px;padding:4px 10px;font-size:12px;color:#666;cursor:pointer;font-family:inherit;white-space:nowrap}
+.back-btn:hover{background:#f5f5f0}
+.htitle{font-size:15px;font-weight:600;color:#1a1a1a}
+.hsub{font-size:12px;color:#888;margin-top:1px}
+.scrollable{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px}
+.nav-tabs{display:flex;border-bottom:1px solid rgba(0,0,0,0.08);flex-shrink:0;background:#fff}
+.tab{flex:1;padding:9px 4px;font-size:11px;font-weight:600;color:#999;cursor:pointer;text-align:center;background:none;border:none;border-bottom:2px solid transparent;font-family:inherit}
+.tab.active{color:#1D9E75;border-bottom-color:#1D9E75}
+.bot-nav{display:flex;border-top:1px solid rgba(0,0,0,0.08);flex-shrink:0;background:#fff}
+.nav-btn{flex:1;padding:10px 4px;font-size:11px;font-weight:600;color:#aaa;cursor:pointer;text-align:center;background:none;border:none;font-family:inherit;display:flex;flex-direction:column;align-items:center;gap:3px}
+.nav-btn.active{color:#1D9E75}
+.card{background:#fff;border:1px solid rgba(0,0,0,0.1);border-radius:12px;padding:12px 14px}
+.stat-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:10px;flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.08)}
+.stat-box{background:#f8f8f5;border-radius:8px;padding:9px;text-align:center}
+.stat-num{font-size:20px;font-weight:700;color:#1a1a1a}
+.stat-lbl{font-size:11px;color:#888;margin-top:1px}
+.pb-wrap{padding:9px 12px;flex-shrink:0;border-bottom:1px solid rgba(0,0,0,0.08)}
+.pb-lbl{font-size:11px;color:#888;margin-bottom:4px}
+.pb-track{height:5px;background:#eee;border-radius:3px;overflow:hidden}
+.pb-fill{height:100%;border-radius:3px;background:#1D9E75;transition:width .4s}
+.search-wrap{display:flex;align-items:center;gap:7px;background:#f8f8f5;border-radius:8px;padding:7px 11px;border:1px solid rgba(0,0,0,0.1);margin-bottom:0}
+.search-wrap input{background:none;border:none;outline:none;font-size:13px;color:#1a1a1a;flex:1;font-family:inherit}
+.search-wrap input::placeholder{color:#bbb}
+.disc-card{border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:background .12s}
+.disc-card:hover{background:#f8f8f5}
+.macete-item{border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:10px 12px;cursor:pointer;display:flex;align-items:flex-start;gap:9px;transition:background .12s}
+.macete-item:hover{background:#f8f8f5}
+.kw-pill{background:#E1F5EE;color:#085041;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;display:inline-block}
+.detail-body{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:11px}
+.sec{border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:12px}
+.sec-label{font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;font-weight:600}
+.sec-text{font-size:13px;color:#333;line-height:1.65}
+.peg-box{border:1px solid #F5C4B3;background:#FAECE7;border-radius:8px;padding:12px}
+.peg-label{font-size:11px;color:#993C1D;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;font-weight:600}
+.peg-text{font-size:13px;color:#712B13;line-height:1.65}
+.gerar-btn{background:#1D9E75;color:#fff;border:none;border-radius:8px;padding:13px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;flex-shrink:0;transition:background .15s}
+.gerar-btn:hover{background:#0F6E56}
+.gerar-btn:disabled{background:#ddd;color:#999;cursor:not-allowed}
+.spinner{width:24px;height:24px;border:2.5px solid #e0e0e0;border-top-color:#1D9E75;border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.enunciado{background:#f8f8f5;border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:13px;font-size:13px;color:#333;line-height:1.7}
+.alt-btn{border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:9px 12px;cursor:pointer;display:flex;gap:9px;align-items:flex-start;background:#fff;text-align:left;font-family:inherit;font-size:13px;color:#333;line-height:1.5;width:100%;transition:background .12s}
+.alt-btn:hover:not(:disabled){background:#f8f8f5}
+.alt-btn.correct{border-color:#5DCAA5;background:#E1F5EE;color:#085041}
+.alt-btn.wrong{border-color:#F0997B;background:#FAECE7;color:#4A1B0C}
+.result-bar{border-radius:8px;padding:10px 12px;display:flex;align-items:center;gap:9px}
+.result-bar.ac{background:#E1F5EE;border:1px solid #5DCAA5}
+.result-bar.er{background:#FAECE7;border:1px solid #F0997B}
+.ri{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ri.ac{background:#5DCAA5}.ri.er{background:#F0997B}
+.badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600}
+.bg-urg{background:#FCEBEB;color:#A32D2D}
+.bg-soon{background:#FAEEDA;color:#854F0B}
+.bg-ok{background:#E1F5EE;color:#085041}
+.bg-done{background:#f0f0ec;color:#888}
+.bg-disc{background:#EEEDFE;color:#3C3489}
+.rev-btn{margin-top:9px;width:100%;padding:8px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid #1D9E75;border-radius:8px;color:#0F6E56;background:#E1F5EE;font-family:inherit;transition:background .12s}
+.rev-btn:hover{background:#d0ede3}
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;padding:36px 20px;text-align:center;gap:9px}
+.empty-title{font-size:14px;font-weight:600;color:#333}
+.empty-sub{font-size:12px;color:#aaa;line-height:1.6}
+.gab-box{border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:13px}
+.gab-label{font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;font-weight:600}
+.gab-text{font-size:13px;color:#333;line-height:1.65}
+.macete-ref-box{background:#E1F5EE;border-radius:8px;padding:9px 12px}
+/* LOGIN */
+.login-wrap{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 24px}
+.login-logo{width:52px;height:52px;background:#1D9E75;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+.login-title{font-size:20px;font-weight:700;color:#1a1a1a;margin-bottom:5px;text-align:center}
+.login-sub{font-size:13px;color:#888;margin-bottom:24px;text-align:center;line-height:1.5}
+.login-form{width:100%;display:flex;flex-direction:column;gap:12px}
+.field-label{font-size:12px;color:#666;margin-bottom:3px;font-weight:600}
+.login-input{width:100%;padding:11px 13px;font-size:14px;border:1.5px solid #e0e0e0;border-radius:9px;background:#fff;color:#1a1a1a;font-family:inherit;outline:none;transition:border-color .15s}
+.login-input:focus{border-color:#1D9E75}
+.login-btn{width:100%;padding:13px;background:#1D9E75;color:#fff;border:none;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:2px;transition:background .15s}
+.login-btn:hover{background:#0F6E56}
+.login-btn:disabled{background:#ddd;color:#999;cursor:not-allowed}
+.login-toggle{font-size:12px;color:#888;text-align:center;margin-top:10px}
+.login-toggle span{color:#1D9E75;cursor:pointer;text-decoration:underline;font-weight:600}
+.login-err{font-size:12px;color:#A32D2D;background:#FCEBEB;border-radius:8px;padding:9px 12px;text-align:center;font-weight:500}
+.users-list{width:100%;margin-top:4px;display:flex;flex-direction:column;gap:6px}
+.user-item{border:1px solid rgba(0,0,0,0.1);border-radius:8px;padding:9px 12px;cursor:pointer;display:flex;align-items:center;gap:9px;transition:background .12s}
+.user-item:hover{background:#f8f8f5}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;color:#fff}
+/* ANALYTICS */
+.analytics-body{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:12px}
+.disc-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(0,0,0,0.06)}
+.disc-row:last-child{border-bottom:none}
+.disc-bar-track{flex:1;height:8px;background:#eee;border-radius:4px;overflow:hidden}
+.disc-bar-fill{height:100%;border-radius:4px;transition:width .6s}
+.prog-strip{padding:7px 12px;background:#f8f8f5;border-bottom:1px solid rgba(0,0,0,0.08);display:flex;align-items:center;gap:9px;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- LOGIN -->
+<div class="screen active" id="s-login">
+  <div class="login-wrap">
+    <div class="login-logo">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none"><path d="M5 8h16M5 13h16M5 18h10" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="login-title">199 Macetes OAB</div>
+    <div class="login-sub" id="login-sub">Entre ou crie sua conta para salvar seu progresso</div>
+    <div class="login-form">
+      <div id="login-err" style="display:none" class="login-err"></div>
+      <div>
+        <div class="field-label">Nome de usuário</div>
+        <input class="login-input" id="inp-user" type="text" placeholder="Ex: joao_silva" autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <div>
+        <div class="field-label">Senha</div>
+        <input class="login-input" id="inp-pass" type="password" placeholder="Mínimo 4 caracteres" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="login-btn" id="login-btn" onclick="doLogin()">Entrar</button>
+      <div class="login-toggle" id="login-toggle">Não tem conta? <span onclick="toggleMode()">Criar conta</span></div>
+    </div>
+    <div style="margin-top:20px;width:100%">
+      <div style="font-size:11px;color:#bbb;text-align:center;margin-bottom:8px">— ou entre como —</div>
+      <div class="users-list" id="users-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div class="screen" id="s-home">
+  <div class="hdr">
+    <div class="hdr-row" style="margin-bottom:9px">
+      <div style="width:30px;height:30px;background:#1D9E75;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+        <svg width="17" height="17" viewBox="0 0 17 17" fill="none"><path d="M3 4.5h11M3 8.5h11M3 12.5h7" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <div style="flex:1"><div class="htitle">199 Macetes OAB</div><div class="hsub" id="home-user-lbl"></div></div>
+      <button onclick="doLogout()" style="font-size:11px;padding:4px 9px;cursor:pointer;border:1px solid rgba(0,0,0,0.12);border-radius:7px;background:none;color:#888;font-family:inherit">sair</button>
+    </div>
+    <div class="search-wrap">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4" stroke="#bbb" stroke-width="1.4"/><path d="M9.5 9.5l2 2" stroke="#bbb" stroke-width="1.4" stroke-linecap="round"/></svg>
+      <input type="text" placeholder="Buscar macete..." id="srch" oninput="doSearch(this.value)"/>
+    </div>
+  </div>
+  <div class="prog-strip">
+    <div style="flex:1;height:4px;background:#e0e0e0;border-radius:2px;overflow:hidden"><div class="pb-fill" id="prog-fill" style="width:0%"></div></div>
+    <div style="font-size:11px;color:#999;white-space:nowrap" id="prog-lbl">0 de 199 vistos</div>
+  </div>
+  <div class="scrollable" id="home-list"></div>
+  <div class="bot-nav">
+    <button class="nav-btn active" id="nav-home" onclick="goHome()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M5 9h8M5 6h8M5 12h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Macetes
+    </button>
+    <button class="nav-btn" id="nav-cad" onclick="goCaderno()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="2.5" stroke="currentColor" stroke-width="1.4"/><path d="M6 7l2 2 4-4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>Caderno
+      <span id="cad-badge" style="display:none;background:#E24B4A;color:#fff;border-radius:10px;font-size:10px;padding:1px 6px;font-weight:700"></span>
+    </button>
+    <button class="nav-btn" id="nav-analytics" onclick="goAnalytics()">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="10" width="3" height="6" rx="1" fill="currentColor"/><rect x="7" y="6" width="3" height="10" rx="1" fill="currentColor"/><rect x="12" y="3" width="3" height="13" rx="1" fill="currentColor"/></svg>Analytics
+    </button>
+  </div>
+</div>
+
+<!-- DISCIPLINA -->
+<div class="screen" id="s-disc">
+  <div class="hdr">
+    <div class="hdr-row">
+      <button class="back-btn" onclick="showScreen('home')">← voltar</button>
+      <div><div class="htitle" id="disc-hname"></div><div class="hsub" id="disc-hcount"></div></div>
+    </div>
+  </div>
+  <div class="scrollable" id="disc-list"></div>
+</div>
+
+<!-- MACETE -->
+<div class="screen" id="s-macete">
+  <div class="hdr">
+    <div class="hdr-row">
+      <button class="back-btn" id="macete-back">← voltar</button>
+      <div class="hsub" id="macete-disc-lbl"></div>
+    </div>
+  </div>
+  <div class="detail-body">
+    <div style="font-size:17px;font-weight:700;color:#1a1a1a;line-height:1.4" id="m-title"></div>
+    <div class="sec"><div class="sec-label">Explicação</div><div class="sec-text" id="m-exp"></div></div>
+    <div class="sec"><div class="sec-label">Exemplo prático</div><div class="sec-text" id="m-ex"></div></div>
+    <div><div class="sec-label" style="margin-bottom:6px">Palavra-chave</div><span style="font-size:14px;font-weight:700;color:#0F6E56;background:#E1F5EE;padding:8px 14px;border-radius:8px;display:inline-block" id="m-kw"></span></div>
+    <div class="peg-box"><div class="peg-label">⚠ Pegadinha FGV</div><div class="peg-text" id="m-peg"></div></div>
+    <button class="gerar-btn" id="gerar-btn" onclick="gerarQuestao()">✦ Gerar questão estilo OAB</button>
+  </div>
+</div>
+
+<!-- QUESTÃO -->
+<div class="screen" id="s-questao">
+  <div class="hdr">
+    <div class="hdr-row">
+      <button class="back-btn" onclick="showScreen('macete')">← macete</button>
+      <div><div class="htitle">Questão OAB</div><div class="hsub" id="q-disc-lbl"></div></div>
+    </div>
+  </div>
+  <div class="scrollable" id="q-content"></div>
+</div>
+
+<!-- CADERNO -->
+<div class="screen" id="s-caderno">
+  <div class="hdr">
+    <div class="hdr-row">
+      <button class="back-btn" onclick="goHome()">← macetes</button>
+      <div><div class="htitle">Caderno de erros</div><div class="hsub" id="cad-sub"></div></div>
+    </div>
+  </div>
+  <div class="stat-grid">
+    <div class="stat-box"><div class="stat-num" id="st-total">0</div><div class="stat-lbl">total</div></div>
+    <div class="stat-box"><div class="stat-num" id="st-rev" style="color:#A32D2D">0</div><div class="stat-lbl">revisar agora</div></div>
+    <div class="stat-box"><div class="stat-num" id="st-ok" style="color:#0F6E56">0</div><div class="stat-lbl">resolvidos</div></div>
+  </div>
+  <div class="pb-wrap">
+    <div class="pb-lbl" id="cad-pb-lbl">0% de aproveitamento</div>
+    <div class="pb-track"><div class="pb-fill" id="cad-pb" style="width:0%"></div></div>
+  </div>
+  <div class="nav-tabs">
+    <button class="tab active" id="tab-rev" onclick="switchTab('rev')">Revisar agora</button>
+    <button class="tab" id="tab-pend" onclick="switchTab('pend')">Pendentes</button>
+    <button class="tab" id="tab-ok" onclick="switchTab('ok')">Resolvidos</button>
+  </div>
+  <div class="scrollable" id="cad-list"></div>
+</div>
+
+<!-- REVISÃO -->
+<div class="screen" id="s-revisao">
+  <div class="hdr">
+    <div class="hdr-row">
+      <button class="back-btn" onclick="goCaderno()">← caderno</button>
+      <div><div class="htitle">Revisão</div><div class="hsub" id="rev-disc"></div></div>
+    </div>
+  </div>
+  <div class="scrollable" id="rev-content"></div>
+</div>
+
+<!-- ANALYTICS -->
+<div class="screen" id="s-analytics">
+  <div class="hdr">
+    <div class="hdr-row">
+      <button class="back-btn" onclick="goHome()">← macetes</button>
+      <div><div class="htitle">Painel de desempenho</div><div class="hsub" id="analytics-user-lbl"></div></div>
+    </div>
+  </div>
+  <div class="analytics-body" id="analytics-body"></div>
+</div>
+
+</div>
+
+<script>
+// ============================================================
+// DADOS: 199 MACETES COMPLETOS
+// INSTRUÇÃO PARA O CLAUDE CODE WEB:
+// Este array contém apenas macetes de demonstração.
+// Você deve popular com TODOS os 199 macetes do PDF original.
+// Cada macete tem: num, disc, title, kw, exp, ex, peg
+// ============================================================
+const MACETES=[
+{num:1,disc:'Ética',title:'Exceção aos Atos Privativos',kw:'HC = qualquer pessoa',exp:'A impetração de habeas corpus não é atividade privativa de advogado, podendo ser realizada por qualquer pessoa (Art. 1º, § 1º, EOAB).',ex:'Familiar do preso impetra HC diretamente, sem advogado: ato válido.',peg:'A FGV apresenta o HC como ato privativo de advogado. Errado! É o único ato que qualquer pessoa pode praticar.'},
+{num:2,disc:'Ética',title:'Atos Nulos por Pessoa Não Inscrita',kw:'SEM OAB = NULO',exp:'Atos privativos de advocacia praticados por pessoas não inscritas na OAB, ou por advogados suspensos/impedidos/licenciados, são nulos de pleno direito.',ex:'Pessoa sem inscrição assina petição: ato nulo, sem efeito.',peg:'Confundir nulidade com anulabilidade. Aqui é NULO (absoluto), não anulável.'},
+{num:3,disc:'Ética',title:'Inexistência de Hierarquia',kw:'SEM HIERARQUIA',exp:'Não há hierarquia entre advogados, juízes e promotores. Durante audiências, advogados permanecem no mesmo plano topográfico.',ex:'Advogado não se levanta ao chefe do MP entrar: conduta correta.',peg:'Pensar que magistrado é superior ao advogado na audiência.'},
+{num:4,disc:'Ética',title:'Quebra da Inviolabilidade do Escritório',kw:'4 REQUISITOS CUMULATIVOS',exp:'Para quebrar a inviolabilidade: decisão judicial motivada, indícios de autoria/materialidade, mandado específico e presença de representante da OAB.',ex:'Busca sem representante da OAB: ilegal.',peg:'Achar que basta mandado judicial.'},
+{num:5,disc:'Ética',title:'Acesso aos Autos sob Sigilo',kw:'SIGILO = PROCURAÇÃO OBRIGATÓRIA',exp:'O advogado pode examinar autos de qualquer processo mesmo sem procuração. Porém, se o processo estiver sob sigilo, a procuração torna-se obrigatória.',ex:'Processo sigiloso: advogado sem procuração não tem acesso.',peg:'Pensar que sempre precisa de procuração. A regra é que não precisa, exceto no sigilo.'},
+{num:6,disc:'Ética',title:'Prisão Cautelar do Advogado',kw:'SALA DE ESTADO MAIOR',exp:'O advogado não pode ser preso antes do trânsito em julgado salvo em Sala de Estado Maior. Caso não haja essa sala, a prisão é convertida em domiciliar.',ex:'Não há Sala de Estado Maior: prisão cautelar convertida em domiciliar.',peg:'Achar que advogado pode ser preso normalmente.'},
+{num:7,disc:'Ética',title:'Direitos da Advogada Mãe',kw:'30 DIAS + ÚNICA PATRONA',exp:'A advogada que der à luz ou adotar tem direito à suspensão dos prazos por 30 dias, desde que seja a única patrona e notifique o cliente por escrito.',ex:'Advogada que não é única patrona dá à luz: não há suspensão automática.',peg:'Esquecer o requisito "única patrona" e a notificação por escrito.'},
+{num:8,disc:'Ética',title:'Inscrição do Estagiário',kw:'SEM EXAME DE ORDEM',exp:'O estagiário não precisa de diploma ou aprovação no Exame de Ordem para se inscrever na OAB. Precisa estar nos últimos anos do curso de Direito.',ex:'Aluno do 4º ano admitido em escritório: pode se inscrever como estagiário.',peg:'Confundir requisitos do advogado com os do estagiário.'},
+{num:9,disc:'Ética',title:'Inscrição Suplementar (5 Causas)',kw:'MAIS DE 5 = SUPLEMENTAR',exp:'O advogado que patrocinar mais de 5 causas por ano em outro Estado é obrigado a requerer inscrição suplementar no respectivo Conselho Seccional.',ex:'Advogado de SP com 6 causas no RJ/ano: obrigado a pedir inscrição suplementar.',peg:'Achar que pode advogar em qualquer estado sem restrição.'},
+{num:10,disc:'Ética',title:'Licenciamento x Cancelamento',kw:'CANCEL=DEFINITIVO / LIC=TEMPORÁRIO',exp:'Cancelamento é definitivo (perde o número). Licenciamento é temporário (mantém o número ao fim da licença).',ex:'Advogado com doença mental curável: licenciamento, não cancelamento.',peg:'Trocar os institutos. Cancelamento é permanente; licenciamento é temporário.'},
+{num:11,disc:'Ética',title:'Unicidade Societária',kw:'1 SOCIEDADE POR SECCIONAL',exp:'Um advogado não pode integrar mais de uma sociedade de advogados dentro da mesma área territorial do Conselho Seccional.',ex:'Advogado sócio de duas sociedades na mesma seccional: vedado.',peg:'Pensar que pode participar de várias sociedades na mesma seccional.'},
+{num:12,disc:'Ética',title:'Razão Social (Nome Fantasia Proibido)',kw:'NOME REAL OBRIGATÓRIO',exp:'A razão social deve obrigatoriamente conter o nome de pelo menos um advogado responsável. É proibido nome fantasia ou características de sociedade empresária (LTDA, S/A).',ex:'"Silva & Associados Advocacia Ltda": inválido.',peg:'Usar denominações empresariais como S/A ou Ltda.'},
+{num:13,disc:'Ética',title:'Honorários e Acordo Extrajudicial',kw:'ACORDO SEM ADVOGADO = HONORÁRIOS DEVIDOS',exp:'Se o cliente fizer acordo sem o conhecimento do advogado, isso não prejudica o direito do advogado de receber seus honorários.',ex:'Cliente fecha acordo sem avisar o advogado: advogado ainda recebe honorários.',peg:'Pensar que o acordo do cliente libera os honorários.'},
+{num:14,disc:'Ética',title:'Liberação de Bens Bloqueados',kw:'20% DESBLOQUEIO',exp:'Com bloqueio universal do patrimônio, o advogado pode requerer desbloqueio de até 20% para pagamento de honorários. Não se aplica a crimes de tráfico ou trabalho escravo.',ex:'Cliente com bloqueio total por crime comum: advogado pede 20% para honorários.',peg:'Aplicar a regra a crimes de tráfico de drogas ou trabalho escravo.'},
+{num:15,disc:'Ética',title:'Substabelecimento com Reserva',kw:'COM RESERVA = SEM COBRANÇA DIRETA',exp:'O advogado que recebe substabelecimento com reserva não pode cobrar honorários diretamente do cliente sem a intervenção do advogado original.',ex:'Advogado B recebeu substabelecimento com reserva: cobra pelo advogado A.',peg:'Achar que o substabelecido com reserva pode cobrar direto do cliente.'},
+{num:16,disc:'Ética',title:'Incompatibilidade x Impedimento',kw:'INCOMPAT=TOTAL / IMPED=PARCIAL',exp:'Incompatibilidade: proibição TOTAL (nem em causa própria). Impedimento: proibição PARCIAL (pode atuar, exceto em certas situações).',ex:'Servidor em cargo incompatível: não pode advogar nem em causa própria.',peg:'Confundir incompatibilidade com impedimento.'},
+{num:17,disc:'Ética',title:'Incompatibilidade de Militares e Policiais',kw:'MILITAR/POLICIAL = INCOMPATÍVEL',exp:'Militares da ativa e policiais são incompatíveis com a advocacia. O STF (ADI 7227) declarou inconstitucional advogar em causa própria nesses casos.',ex:'Delegado em atividade quer advogar em causa própria: vedado.',peg:'Pensar que militares/policiais podem advogar em causa própria.'},
+{num:18,disc:'Ética',title:'Impedimento do Professor',kw:'PROFESSOR = PODE ADVOGAR CONTRA',exp:'Servidores públicos não podem advogar contra a Fazenda que os remunera. Exceção: docentes de cursos jurídicos NÃO sofrem esse impedimento.',ex:'Professor universitário pode advogar contra a universidade pública que o remunera.',peg:'Aplicar o impedimento ao professor de curso jurídico. Ele é a exceção expressa na lei.'},
+{num:19,disc:'Ética',title:'Renúncia ao Mandato (Os 10 dias)',kw:'RENÚNCIA = 10 DIAS',exp:'Se o advogado renunciar, deve continuar representando o cliente por 10 dias após a notificação, salvo se um substituto assumir antes.',ex:'Advogado notifica cliente da renúncia: continua por 10 dias.',peg:'Achar que a renúncia é imediata.'},
+{num:20,disc:'Ética',title:'Revogação do Mandato',kw:'REVOGAÇÃO = IMEDIATA + HONORÁRIOS',exp:'A revogação parte do cliente e cessa a atuação do advogado imediatamente. O cliente paga os honorários proporcionais ao trabalho realizado.',ex:'Cliente revoga mandato no meio do processo: paga honorários proporcionais.',peg:'Achar que revogação e renúncia têm os mesmos efeitos.'},
+{num:21,disc:'Ética',title:'Sigilo Profissional',kw:'SIGILO = ORDEM PÚBLICA',exp:'É de ordem pública e independe do pedido do cliente. Só pode ser quebrado em situações extremas: grave ameaça à vida, honra ou para a própria defesa do advogado.',ex:'Cliente pede ao advogado que revele informação: advogado NÃO pode revelar sem justa causa.',peg:'Pensar que o cliente pode dispensar o advogado do sigilo.'},
+{num:22,disc:'Ética',title:'Publicidade (Vedações Absolutas)',kw:'SEM RÁDIO/TV/OUTDOOR',exp:'A publicidade deve ser sempre informativa. É vedada a utilização de rádio, cinema, televisão, outdoors e panfletos com captação de clientela.',ex:'Advogado anuncia no rádio: vedado.',peg:'Pensar que qualquer publicidade é permitida.'},
+{num:23,disc:'Ética',title:'Sanção de Exclusão',kw:'EXCLUSÃO = 2/3 DO SECCIONAL',exp:'É a penalidade mais grave. Só é aplicada com aprovação de 2/3 do Conselho Seccional, nos casos de falsa prova de inscrição, crime infamante ou três suspensões.',ex:'Advogado com três suspensões: pode ser excluído com quórum de 2/3.',peg:'Esquecer o quórum qualificado de 2/3.'},
+{num:24,disc:'Ética',title:'Subseções sem Personalidade Jurídica',kw:'SUBSEÇÃO = SEM PERSONALIDADE',exp:'Diferente do Conselho Federal, Seccionais e Caixas de Assistência, as Subseções NÃO possuem personalidade jurídica; são partes autônomas do Conselho Seccional.',ex:'Subseção da OAB não pode celebrar contratos em nome próprio.',peg:'Atribuir personalidade jurídica às subseções.'},
+{num:25,disc:'Constitucional',title:'Poder Constituinte Originário (3IA)',kw:'INICIAL ILIMITADO INCONDICIONADO AUTÔNOMO',exp:'O PCO é responsável pela criação de nova Constituição. Características: Inicial, Ilimitado, Incondicionado e Autônomo. Não se submete a regras anteriores.',ex:'A CF/88 foi criada pelo PCO, sem limitações jurídicas anteriores.',peg:'Confundir PCO com PCD Reformador. O PCO não tem limites; o Derivado tem.'},
+{num:35,disc:'Constitucional',title:'Cláusulas Pétreas (Quarteto Intocável)',kw:'FORMA FEDERAL / DIREITOS / PODERES / VOTO',exp:'Uma PEC pode ser inconstitucional se ferir: forma federativa de Estado, direitos e garantias individuais, separação dos poderes e voto (direto, secreto, universal e periódico).',ex:'PEC que extingue o voto direto: inconstitucional.',peg:'Incluir a forma de governo (república) como cláusula pétrea. Só a forma de Estado é pétrea.'},
+{num:43,disc:'Administrativo',title:'Autarquias x Empresas Estatais',kw:'AUTARQUIA=PÚBLICO / ESTATAL=PRIVADO',exp:'Autarquias: Direito Público (bens impenhoráveis). Empresas Públicas e SEM: Direito Privado (bens penhoráveis, CLT).',ex:'Empresa Pública: empregados CLT, bens penhoráveis.',peg:'Atribuir características de autarquia às empresas estatais.'},
+{num:58,disc:'Civil',title:'Incapacidade Absoluta e Relativa',kw:'MENOR 16=NULO / 16-18=ANULÁVEL',exp:'Absolutamente incapazes: menores de 16 anos (atos = NULOS). Relativamente incapazes: 16 a 18 anos (atos = ANULÁVEIS).',ex:'Adolescente de 15 anos assina contrato sozinho: ato nulo.',peg:'Confundir nulo com anulável.'},
+{num:94,disc:'Penal',title:'Tempo e Lugar do Crime (LUTA)',kw:'LUGAR=UBIQUIDADE / TEMPO=ATIVIDADE',exp:'Lugar do crime: teoria da Ubiquidade. Tempo do crime: teoria da Atividade (momento da conduta).',ex:'LUTA: Lugar=Ubiquidade, Tempo=Atividade.',peg:'Confundir as teorias.'},
+{num:126,disc:'Direito do Trabalho',title:'Horas in itinere',kw:'TRAJETO NÃO CONTA NA JORNADA',exp:'O tempo de trajeto não é computado na jornada, mesmo que o empregador forneça o transporte.',ex:'Empresa fornece ônibus: tempo de trajeto não gera horas extras.',peg:'Incluir tempo de trajeto na jornada.'},
+{num:154,disc:'Tributário',title:'Natureza do CTN',kw:'CTN = STATUS DE LEI COMPLEMENTAR',exp:'O CTN foi promulgado como Lei Ordinária mas tem status de Lei Complementar pela CF/88.',ex:'CTN pode estabelecer prescrição tributária: sim, status de LC.',peg:'Tratar o CTN como lei ordinária.'},
+{num:177,disc:'Direitos Humanos',title:'Hierarquia Dupla dos Tratados de DH',kw:'3/5 DOIS TURNOS=EMENDA / DEMAIS=SUPRALEGAL',exp:'Tratados de DH aprovados com 3/5 em dois turnos = emenda constitucional. Caso contrário = status supralegal.',ex:'Pacto de San José da Costa Rica: status supralegal.',peg:'Tratar todos os tratados de DH como emenda constitucional.'},
+{num:199,disc:'Previdenciário',title:'Adicional de 25% Fura-Teto',kw:'25% MESMO ACIMA DO TETO RGPS',exp:'Na Aposentadoria por Invalidez, se precisar de assistência permanente: acréscimo de 25%, mesmo ultrapassando o teto do RGPS.',ex:'Aposentado no teto: 25% pago acima do teto.',peg:'Limitar o adicional de 25% ao teto do RGPS.'}
+];
+
+// ============================================================
+// CONFIGURAÇÃO DA API
+// INSTRUÇÃO PARA O CLAUDE CODE WEB:
+// Substitua esta chamada direta por uma rota de servidor
+// (ex: /api/gerar-questao) que use a chave de API com segurança
+// ============================================================
+const ANTHROPIC_API_URL = 'https://api.anthropic.com/v1/messages';
+const ANTHROPIC_MODEL = 'claude-sonnet-4-20250514';
+
+const DISCS=[...new Set(MACETES.map(m=>m.disc))];
+const DISC_ICONS={'Ética':'⚖','Constitucional':'📜','Administrativo':'🏢','Civil':'⚡','Processo Civil':'📋','Penal':'🔒','Processo Penal':'🔍','Direito do Trabalho':'🏭','Processo do Trabalho':'🏛','Tributário':'💰','Empresarial':'📈','Direitos Humanos':'✊','Ambiental':'🌿','ECA':'👶','Consumidor':'🛒','Internacional':'🌐','Filosofia':'📚','Financeiro':'🏦','Eleitoral':'🗳','Previdenciário':'🏥'};
+const DISC_COLORS={'Ética':'#E1F5EE','Constitucional':'#EEEDFE','Administrativo':'#E6F1FB','Civil':'#FAEEDA','Processo Civil':'#EAF3DE','Penal':'#FCEBEB','Processo Penal':'#FAECE7','Direito do Trabalho':'#E1F5EE','Processo do Trabalho':'#E6F1FB','Tributário':'#FAEEDA','Empresarial':'#EEEDFE','Direitos Humanos':'#FBEAF0','Ambiental':'#EAF3DE','ECA':'#E1F5EE','Consumidor':'#FAEEDA','Internacional':'#E6F1FB','Filosofia':'#EEEDFE','Financeiro':'#FAEEDA','Eleitoral':'#FCEBEB','Previdenciário':'#FBEAF0'};
+const DISC_CHART_COLORS=['#1D9E75','#534AB7','#D85A30','#185FA5','#BA7517','#993556','#3B6D11','#993C1D','#888780','#1D9E75','#534AB7','#D85A30','#185FA5','#BA7517','#993556','#3B6D11','#993C1D','#888780','#534AB7','#1D9E75'];
+
+// ============================================================
+// ARMAZENAMENTO LOCAL (localStorage para versão standalone)
+// INSTRUÇÃO PARA O CLAUDE CODE WEB:
+// Substitua este storage por Supabase para persistência real
+// entre dispositivos e para múltiplos usuários simultâneos
+// ============================================================
+const storage={
+  get:(k)=>{try{const v=localStorage.getItem(k);return v?JSON.parse(v):null}catch{return null}},
+  set:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch{}}
+};
+
+let currentUser=null,curDisc=null,curMacete=null,curTab='rev';
+let respondido=false,respondidoRev=false,loginMode='login',analyticsChart=null;
+
+function getUsers(){return storage.get('oab-users')||{}}
+function saveUsers(u){storage.set('oab-users',u)}
+function loadCad(){return storage.get('oab-cad-'+currentUser)||[]}
+function saveCad(d){storage.set('oab-cad-'+currentUser,d)}
+function loadSeen(){return storage.get('oab-seen-'+currentUser)||{}}
+function saveSeen(d){storage.set('oab-seen-'+currentUser,d)}
+
+function showScreen(n){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById('s-'+n).classList.add('active')}
+function setNavActive(id){document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function avatarColor(name){const c=['#1D9E75','#534AB7','#D85A30','#185FA5','#993556'];return c[name.charCodeAt(0)%c.length]}
+function initials(name){return name.slice(0,2).toUpperCase()}
+
+function renderLoginUsers(){
+  const users=getUsers();const names=Object.keys(users);
+  const list=document.getElementById('users-list');
+  if(names.length===0){list.innerHTML='<div style="font-size:12px;color:#bbb;text-align:center">Nenhum usuário cadastrado ainda</div>';return}
+  list.innerHTML=names.slice(0,4).map(n=>`<div class="user-item" onclick="quickLogin('${n}')"><div class="avatar" style="background:${avatarColor(n)}">${initials(n)}</div><div style="font-size:13px;font-weight:600;color:#333">${n}</div><div style="margin-left:auto;font-size:11px;color:#bbb">→</div></div>`).join('');
+}
+
+function quickLogin(name){document.getElementById('inp-user').value=name;document.getElementById('inp-pass').focus()}
+
+function toggleMode(){
+  loginMode=loginMode==='login'?'register':'login';
+  const isReg=loginMode==='register';
+  document.getElementById('login-sub').textContent=isReg?'Crie sua conta gratuitamente':'Entre com suas credenciais';
+  document.getElementById('login-btn').textContent=isReg?'Criar conta':'Entrar';
+  document.getElementById('login-toggle').innerHTML=isReg?'Já tem conta? <span onclick="toggleMode()">Entrar</span>':'Não tem conta? <span onclick="toggleMode()">Criar conta</span>';
+  document.getElementById('login-err').style.display='none';
+}
+
+function showErr(msg){const el=document.getElementById('login-err');el.textContent=msg;el.style.display='block'}
+
+function doLogin(){
+  const user=document.getElementById('inp-user').value.trim().toLowerCase().replace(/\s+/g,'_');
+  const pass=document.getElementById('inp-pass').value;
+  if(!user){showErr('Digite um nome de usuário');return}
+  if(pass.length<4){showErr('A senha deve ter mínimo 4 caracteres');return}
+  const users=getUsers();
+  if(loginMode==='register'){
+    if(users[user]){showErr('Nome de usuário já existe. Escolha outro.');return}
+    users[user]=btoa(pass);saveUsers(users);
+  } else {
+    if(!users[user]||users[user]!==btoa(pass)){showErr('Usuário ou senha incorretos.');return}
+  }
+  currentUser=user;
+  document.getElementById('login-err').style.display='none';
+  document.getElementById('inp-pass').value='';
+  renderHome();showScreen('home');
+}
+
+function doLogout(){
+  currentUser=null;
+  document.getElementById('inp-user').value='';
+  document.getElementById('inp-pass').value='';
+  loginMode='login';
+  document.getElementById('login-btn').textContent='Entrar';
+  document.getElementById('login-toggle').innerHTML='Não tem conta? <span onclick="toggleMode()">Criar conta</span>';
+  document.getElementById('login-sub').textContent='Entre ou crie sua conta para salvar seu progresso';
+  renderLoginUsers();showScreen('login');
+}
+
+function renderHome(filter=''){
+  const seen=loadSeen();const cad=loadCad();
+  const agora=Date.now();const total=199;
+  const seenCount=Object.keys(seen).length;
+  const urg=cad.filter(e=>e.status!=='resolvido'&&e.proximaRevisao<=agora).length;
+  document.getElementById('prog-fill').style.width=Math.round(seenCount/total*100)+'%';
+  document.getElementById('prog-lbl').textContent=seenCount+' de '+total+' vistos';
+  document.getElementById('home-user-lbl').textContent='Olá, '+currentUser+' 👋';
+  const badge=document.getElementById('cad-badge');
+  if(urg>0){badge.style.display='inline';badge.textContent=urg}else{badge.style.display='none'}
+  setNavActive('nav-home');
+  const list=document.getElementById('home-list');
+  const fl=filter.toLowerCase().trim();
+  if(fl){
+    const res=MACETES.filter(m=>m.title.toLowerCase().includes(fl)||m.kw.toLowerCase().includes(fl)||m.disc.toLowerCase().includes(fl));
+    list.innerHTML=res.length===0?'<div class="empty-state"><div class="empty-title">Nenhum macete encontrado</div></div>':res.map(m=>`<div class="macete-item" onclick="openMacete(${m.num},'home')"><div style="font-size:11px;color:#aaa;min-width:26px;padding-top:1px">#${m.num}</div><div><div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:3px">${m.title}</div><span class="kw-pill">${m.kw}</span></div></div>`).join('');
+    return;
+  }
+  list.innerHTML=DISCS.map(d=>{
+    const ms=MACETES.filter(m=>m.disc===d);
+    const done=ms.filter(m=>seen[m.num]).length;
+    return`<div class="disc-card" onclick="openDisc('${d}')"><div style="width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:${DISC_COLORS[d]||'#E1F5EE'}">${DISC_ICONS[d]||'📌'}</div><div style="flex:1"><div style="font-size:13px;font-weight:600;color:#1a1a1a">${d}</div><div style="font-size:11px;color:#888;margin-top:1px">${ms.length} macetes · ${done} vistos</div></div><div style="font-size:13px;color:#ccc">›</div></div>`
+  }).join('');
+}
+
+function doSearch(v){renderHome(v)}
+
+function openDisc(d){
+  curDisc=d;
+  document.getElementById('disc-hname').textContent=d;
+  const ms=MACETES.filter(m=>m.disc===d);
+  document.getElementById('disc-hcount').textContent=ms.length+' macetes';
+  document.getElementById('disc-list').innerHTML=ms.map(m=>`<div class="macete-item" onclick="openMacete(${m.num},'disc')"><div style="font-size:11px;color:#aaa;min-width:26px;padding-top:1px">#${m.num}</div><div><div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:3px">${m.title}</div><span class="kw-pill">${m.kw}</span></div></div>`).join('');
+  showScreen('disc');
+}
+
+function openMacete(num,from){
+  const m=MACETES.find(x=>x.num===num);if(!m)return;
+  curMacete=m;
+  document.getElementById('macete-disc-lbl').textContent=m.disc+' · #'+m.num;
+  document.getElementById('macete-back').onclick=()=>showScreen(from==='disc'?'disc':'home');
+  document.getElementById('m-title').textContent=m.title;
+  document.getElementById('m-exp').textContent=m.exp;
+  document.getElementById('m-ex').textContent=m.ex;
+  document.getElementById('m-kw').textContent=m.kw;
+  document.getElementById('m-peg').textContent=m.peg;
+  const btn=document.getElementById('gerar-btn');
+  btn.disabled=false;btn.textContent='✦ Gerar questão estilo OAB';
+  respondido=false;
+  showScreen('macete');
+  const seen=loadSeen();
+  if(!seen[num]){seen[num]=Date.now();saveSeen(seen);renderHome();}
+}
+
+function gerarQuestao(){
+  if(!curMacete)return;
+  const btn=document.getElementById('gerar-btn');
+  btn.disabled=true;btn.textContent='Gerando...';
+  respondido=false;
+  document.getElementById('q-disc-lbl').textContent=curMacete.disc+' · #'+curMacete.num;
+  document.getElementById('q-content').innerHTML='<div style="display:flex;align-items:center;gap:12px;padding:24px"><div class="spinner"></div><div style="font-size:13px;color:#888">Criando questão no estilo FGV...</div></div>';
+  showScreen('questao');
+  const p=`Você é especialista em OAB criando questões no estilo da FGV.\nMACETE: "${curMacete.title}"\nEXPLICAÇÃO: "${curMacete.exp}"\nEXEMPLO: "${curMacete.ex}"\nPEGADINHA: "${curMacete.peg}"\nResponda SOMENTE com JSON válido, sem markdown:\n{"enunciado":"caso prático FGV 3-4 linhas","alternativas":[{"letra":"A","texto":"..."},{"letra":"B","texto":"..."},{"letra":"C","texto":"..."},{"letra":"D","texto":"..."}],"correta":"A","gabarito":"explicação completa ligando ao macete"}`;
+  fetch(ANTHROPIC_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:ANTHROPIC_MODEL,max_tokens:1000,messages:[{role:'user',content:p}]})})
+  .then(r=>r.json()).then(d=>{
+    btn.disabled=false;btn.textContent='✦ Gerar questão estilo OAB';
+    const txt=d.content&&d.content[0]?d.content[0].text:'';
+    try{renderQuestao(JSON.parse(txt.replace(/```json|```/g,'').trim()))}
+    catch{document.getElementById('q-content').innerHTML='<div style="padding:20px;font-size:13px;color:#888">Erro ao gerar. Tente novamente.</div>'}
+  }).catch(()=>{btn.disabled=false;btn.textContent='✦ Gerar questão estilo OAB';document.getElementById('q-content').innerHTML='<div style="padding:20px;font-size:13px;color:#888">Erro de conexão.</div>'});
+}
+
+function renderQuestao(q){
+  document.getElementById('q-content').innerHTML=`<div class="enunciado">${q.enunciado}</div><div style="display:flex;flex-direction:column;gap:6px" id="alts-q">${q.alternativas.map(a=>`<button class="alt-btn" id="qa-${a.letra}" onclick="responderQ('${a.letra}','${q.correta}',${JSON.stringify(q).replace(/'/g,"\\'")})"><span style="font-weight:700;min-width:18px">${a.letra})</span><span>${a.texto}</span></button>`).join('')}</div><div id="gab-q" style="display:none"><div class="gab-box"><div class="gab-label">Gabarito comentado</div><div class="gab-text">${q.gabarito}</div></div><div style="margin-top:8px;display:flex;gap:6px"><button onclick="openMacete(${curMacete.num},'macete')" style="flex:1;padding:10px;font-size:12px;cursor:pointer;border:1px solid rgba(0,0,0,0.12);border-radius:8px;background:none;color:#666;font-family:inherit">← ver macete</button><button onclick="gerarQuestao()" style="flex:1;padding:10px;font-size:12px;cursor:pointer;border:1px solid rgba(0,0,0,0.12);border-radius:8px;background:none;color:#666;font-family:inherit">↺ nova questão</button></div></div>`;
+}
+
+function responderQ(escolha,correta,q){
+  if(respondido)return;respondido=true;
+  const acertou=escolha===correta;
+  document.querySelectorAll('#alts-q .alt-btn').forEach(b=>{b.disabled=true;const l=b.id.replace('qa-','');if(l===correta)b.classList.add('correct');else if(l===escolha&&!acertou)b.classList.add('wrong')});
+  if(!acertou){
+    const cad=loadCad();
+    const idx=cad.findIndex(e=>e.maceteNum===curMacete.num&&e.status!=='resolvido');
+    if(idx>=0){cad[idx].tentativas=(cad[idx].tentativas||0)+1;cad[idx].proximaRevisao=Date.now()+(2*86400000);}
+    else cad.push({id:Date.now()+'_'+Math.random().toString(36).substr(2,5),maceteNum:curMacete.num,maceteTitulo:curMacete.title,maceteKw:curMacete.kw,maceteDisc:curMacete.disc,questao:q,dataErro:Date.now(),proximaRevisao:Date.now()+(2*86400000),tentativas:1,status:'pendente',acertos:0});
+    saveCad(cad);
+  }
+  const banner=document.createElement('div');
+  banner.className='result-bar '+(acertou?'ac':'er');
+  banner.innerHTML=`<div class="ri ${acertou?'ac':'er'}"><svg width="14" height="14" viewBox="0 0 14 14" fill="none">${acertou?'<path d="M3 7l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>':'<path d="M4 4l6 6M10 4l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>'}</svg></div><div><div style="font-size:13px;font-weight:600;color:${acertou?'#085041':'#4A1B0C'}">${acertou?'Acertou!':'Errou! Adicionado ao caderno.'}</div><div style="font-size:11px;color:${acertou?'#0F6E56':'#993C1D'};margin-top:2px">${acertou?'Continue assim!':'Revisão agendada para 2 dias.'}</div></div>`;
+  document.getElementById('q-content').insertBefore(banner,document.getElementById('alts-q'));
+  document.getElementById('gab-q').style.display='block';
+}
+
+function goCaderno(){
+  setNavActive('nav-cad');showScreen('caderno');renderCaderno();
+}
+
+function goHome(){
+  setNavActive('nav-home');showScreen('home');renderHome(document.getElementById('srch').value);
+}
+
+function renderCaderno(){
+  const cad=loadCad();const agora=Date.now();
+  const revisar=cad.filter(e=>e.status!=='resolvido'&&e.proximaRevisao<=agora);
+  const pendentes=cad.filter(e=>e.status!=='resolvido'&&e.proximaRevisao>agora);
+  const resolvidos=cad.filter(e=>e.status==='resolvido');
+  document.getElementById('st-total').textContent=cad.length;
+  document.getElementById('st-rev').textContent=revisar.length;
+  document.getElementById('st-ok').textContent=resolvidos.length;
+  const pct=cad.length>0?Math.round(resolvidos.length/cad.length*100):0;
+  document.getElementById('cad-pb').style.width=pct+'%';
+  document.getElementById('cad-pb-lbl').textContent=pct+'% de aproveitamento';
+  document.getElementById('cad-sub').textContent=cad.length+' questão'+(cad.length!==1?'ões':'')+' no caderno';
+  let items=curTab==='rev'?revisar:curTab==='pend'?pendentes:resolvidos;
+  const list=document.getElementById('cad-list');
+  if(items.length===0){
+    const msgs={rev:'Nenhuma questão para revisar agora.',pend:'Nenhuma questão agendada.',ok:'Nenhuma questão resolvida ainda.'};
+    list.innerHTML=`<div class="empty-state"><div class="empty-title">${msgs[curTab]}</div><div class="empty-sub">Gere questões nos macetes para popular o caderno.</div></div>`;return;
+  }
+  list.innerHTML=items.map(e=>{
+    const diff=e.proximaRevisao-agora;
+    let bCls,bTxt;
+    if(e.status==='resolvido'){bCls='bg-done';bTxt='resolvido'}
+    else if(diff<=0){bCls='bg-urg';bTxt='revisar agora'}
+    else if(diff<86400000){bCls='bg-soon';bTxt='amanhã'}
+    else{bCls='bg-ok';bTxt='em '+Math.ceil(diff/86400000)+' dias'}
+    return`<div class="card"><div style="font-size:13px;font-weight:600;color:#1a1a1a;margin-bottom:4px">${e.maceteTitulo}</div><div style="display:flex;gap:5px;flex-wrap:wrap"><span class="badge bg-disc">${e.maceteDisc}</span><span class="badge ${bCls}">${bTxt}</span>${e.tentativas>1?`<span class="badge bg-soon">${e.tentativas}ª tentativa</span>`:''}</div><div style="font-size:11px;color:#aaa;margin-top:4px">Erro em ${new Date(e.dataErro).toLocaleDateString('pt-BR')}</div>${curTab!=='ok'?`<button class="rev-btn" onclick="abrirRevisao('${e.id}')">Revisar agora</button>`:`<button class="rev-btn" style="background:none;border-color:rgba(0,0,0,0.12);color:#888" onclick="reabrirErro('${e.id}')">Reabrir para revisão</button>`}</div>`
+  }).join('');
+}
+
+function switchTab(t){curTab=t;document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));document.getElementById('tab-'+t).classList.add('active');renderCaderno()}
+
+function reabrirErro(id){const cad=loadCad();const i=cad.findIndex(e=>e.id===id);if(i>=0){cad[i].status='pendente';cad[i].proximaRevisao=Date.now();saveCad(cad);}renderCaderno()}
+
+function abrirRevisao(id){
+  const cad=loadCad();const erro=cad.find(e=>e.id===id);if(!erro)return;
+  curMacete=MACETES.find(m=>m.num===erro.maceteNum)||{num:erro.maceteNum,title:erro.maceteTitulo,disc:erro.maceteDisc,kw:erro.maceteKw||'',exp:'',ex:'',peg:''};
+  respondidoRev=false;
+  document.getElementById('rev-disc').textContent=erro.maceteDisc+' · #'+erro.maceteNum;
+  if(erro.questao&&erro.questao.enunciado){renderRevisao(erro);showScreen('revisao');return}
+  document.getElementById('rev-content').innerHTML='<div style="display:flex;align-items:center;gap:12px;padding:24px"><div class="spinner"></div><div style="font-size:13px;color:#888">Gerando nova questão...</div></div>';
+  showScreen('revisao');
+  gerarQuestaoRevisao(erro);
+}
+
+function renderRevisao(erro){
+  const q=erro.questao;
+  document.getElementById('rev-content').innerHTML=`<div class="macete-ref-box"><div style="font-size:11px;color:#0F6E56;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;font-weight:700">Macete sendo revisado</div><div style="font-size:13px;color:#085041;font-weight:600">${erro.maceteTitulo}</div><div style="font-size:11px;color:#1D9E75;margin-top:2px">${erro.maceteKw||''}</div></div><div class="enunciado">${q.enunciado}</div><div style="display:flex;flex-direction:column;gap:6px" id="alts-r">${q.alternativas.map(a=>`<button class="alt-btn" id="ra-${a.letra}" onclick="responderRev('${a.letra}','${q.correta}','${erro.id}')"><span style="font-weight:700;min-width:18px">${a.letra})</span><span>${a.texto}</span></button>`).join('')}</div><div id="gab-r" style="display:none"><div class="gab-box"><div class="gab-label">Gabarito comentado</div><div class="gab-text">${q.gabarito}</div></div><button onclick="goCaderno()" style="margin-top:8px;width:100%;padding:10px;font-size:12px;cursor:pointer;border:1px solid rgba(0,0,0,0.12);border-radius:8px;background:none;color:#666;font-family:inherit">← voltar ao caderno</button></div>`;
+}
+
+function gerarQuestaoRevisao(erro){
+  const m=MACETES.find(x=>x.num===erro.maceteNum);
+  const p=m?`Você é especialista em OAB. Crie questão DIFERENTE para revisão:\nMACETE: "${m.title}"\nEXPLICAÇÃO: "${m.exp}"\nPEGADINHA: "${m.peg}"\nJSON somente:\n{"enunciado":"...","alternativas":[{"letra":"A","texto":"..."},{"letra":"B","texto":"..."},{"letra":"C","texto":"..."},{"letra":"D","texto":"..."}],"correta":"A","gabarito":"..."}`:`Crie questão sobre: ${erro.maceteTitulo}. JSON somente.`;
+  fetch(ANTHROPIC_API_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:ANTHROPIC_MODEL,max_tokens:1000,messages:[{role:'user',content:p}]})})
+  .then(r=>r.json()).then(d=>{
+    const q=JSON.parse(d.content[0].text.replace(/```json|```/g,'').trim());
+    const cad=loadCad();const i=cad.findIndex(e=>e.id===erro.id);
+    if(i>=0){cad[i].questao=q;saveCad(cad);}
+    renderRevisao({...erro,questao:q});
+  }).catch(()=>{document.getElementById('rev-content').innerHTML='<div style="padding:20px;font-size:13px;color:#888">Erro ao gerar. Tente novamente.</div>'});
+}
+
+function responderRev(escolha,correta,erroId){
+  if(respondidoRev)return;respondidoRev=true;
+  const acertou=escolha===correta;
+  document.querySelectorAll('#alts-r .alt-btn').forEach(b=>{b.disabled=true;const l=b.id.replace('ra-','');if(l===correta)b.classList.add('correct');else if(l===escolha&&!acertou)b.classList.add('wrong')});
+  const cad=loadCad();const i=cad.findIndex(e=>e.id===erroId);
+  if(i>=0){
+    if(acertou){cad[i].status='resolvido';cad[i].dataResolucao=Date.now();}
+    else{const t=cad[i].tentativas||1;cad[i].proximaRevisao=Date.now()+((t<=1?2:t<=2?3:7)*86400000);cad[i].tentativas=t+1;}
+    saveCad(cad);
+  }
+  const banner=document.createElement('div');
+  banner.className='result-bar '+(acertou?'ac':'er');
+  banner.innerHTML=`<div class="ri ${acertou?'ac':'er'}"><svg width="14" height="14" viewBox="0 0 14 14" fill="none">${acertou?'<path d="M3 7l3 3 5-5" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>':'<path d="M4 4l6 6M10 4l-6 6" stroke="white" stroke-width="1.8" stroke-linecap="round"/>'}</svg></div><div><div style="font-size:13px;font-weight:600;color:${acertou?'#085041':'#4A1B0C'}">${acertou?'Acertou! Removido do caderno.':'Errou. Reagendado.'}</div></div>`;
+  document.getElementById('rev-content').insertBefore(banner,document.getElementById('alts-r'));
+  document.getElementById('gab-r').style.display='block';
+}
+
+function goAnalytics(){
+  setNavActive('nav-analytics');showScreen('analytics');
+  document.getElementById('analytics-user-lbl').textContent=currentUser;
+  renderAnalytics();
+}
+
+function renderAnalytics(){
+  const cad=loadCad();const seen=loadSeen();const body=document.getElementById('analytics-body');
+  const totalErros=cad.filter(e=>e.status!=='resolvido').length;
+  const totalResolvidos=cad.filter(e=>e.status==='resolvido').length;
+  const totalVistos=Object.keys(seen).length;
+  const taxaAcerto=cad.length>0?Math.round(totalResolvidos/cad.length*100):0;
+  const errosPorDisc={};const questoesPorDisc={};
+  cad.forEach(e=>{
+    const d=e.maceteDisc||'Outros';
+    if(!errosPorDisc[d])errosPorDisc[d]=0;
+    if(!questoesPorDisc[d])questoesPorDisc[d]=0;
+    questoesPorDisc[d]++;
+    if(e.status!=='resolvido')errosPorDisc[d]++;
+  });
+  const discOrdenadas=Object.keys(errosPorDisc).sort((a,b)=>errosPorDisc[b]-errosPorDisc[a]);
+  const maxErros=discOrdenadas.length>0?errosPorDisc[discOrdenadas[0]]:1;
+  const vistosDisc={};MACETES.forEach(m=>{if(seen[m.num])vistosDisc[m.disc]=(vistosDisc[m.disc]||0)+1});
+  const alertaDisc=discOrdenadas.length>0?discOrdenadas[0]:null;
+  if(analyticsChart){analyticsChart.destroy();analyticsChart=null;}
+  body.innerHTML=`
+  <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px">
+    <div class="stat-box"><div class="stat-num">${totalVistos}</div><div class="stat-lbl">macetes vistos</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:#0F6E56">${taxaAcerto}%</div><div class="stat-lbl">taxa de acerto</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:#A32D2D">${totalErros}</div><div class="stat-lbl">erros pendentes</div></div>
+    <div class="stat-box"><div class="stat-num" style="color:#1D9E75">${totalResolvidos}</div><div class="stat-lbl">questões resolvidas</div></div>
+  </div>
+  ${alertaDisc?`<div style="background:#FAECE7;border:1px solid #F5C4B3;border-radius:10px;padding:12px 14px"><div style="font-size:11px;color:#993C1D;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;font-weight:700">⚠ Disciplina com mais erros</div><div style="font-size:15px;font-weight:700;color:#712B13">${alertaDisc}</div><div style="font-size:12px;color:#993C1D;margin-top:2px">${errosPorDisc[alertaDisc]} erro${errosPorDisc[alertaDisc]!==1?'s':''} pendente${errosPorDisc[alertaDisc]!==1?'s':''} · Foque aqui!</div></div>`:''}
+  ${cad.length>0?`<div class="card"><div style="font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:12px">Erros pendentes por disciplina</div>${discOrdenadas.filter(d=>errosPorDisc[d]>0).map((d,i)=>`<div class="disc-row"><div style="font-size:12px;color:#666;min-width:90px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d}</div><div class="disc-bar-track"><div class="disc-bar-fill" style="width:${Math.round(errosPorDisc[d]/maxErros*100)}%;background:${DISC_CHART_COLORS[i%DISC_CHART_COLORS.length]}"></div></div><div style="font-size:12px;font-weight:700;color:#1a1a1a;min-width:20px;text-align:right">${errosPorDisc[d]}</div></div>`).join('')}</div>`:'<div class="card" style="text-align:center;padding:24px 16px"><div style="font-size:14px;font-weight:600;color:#333">Nenhum erro registrado ainda</div><div style="font-size:12px;color:#aaa;margin-top:6px;line-height:1.5">Gere questões nos macetes para ver seu desempenho aqui</div></div>'}
+  ${cad.length>0&&Object.keys(questoesPorDisc).length>0?`<div class="card"><div style="font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:12px">Questões respondidas por disciplina</div><div style="position:relative;height:${Math.max(200,Object.keys(questoesPorDisc).length*36)}px"><canvas id="chart-disc"></canvas></div></div>`:''}
+  <div class="card"><div style="font-size:13px;font-weight:700;color:#1a1a1a;margin-bottom:12px">Macetes vistos por disciplina</div>${DISCS.filter(d=>vistosDisc[d]).sort((a,b)=>(vistosDisc[b]||0)-(vistosDisc[a]||0)).map((d,i)=>`<div class="disc-row"><div style="font-size:12px;color:#666;min-width:90px;max-width:90px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d}</div><div class="disc-bar-track"><div class="disc-bar-fill" style="width:${Math.round((vistosDisc[d]||0)/Math.max(1,...DISCS.map(x=>vistosDisc[x]||0))*100)}%;background:#5DCAA5"></div></div><div style="font-size:12px;font-weight:700;color:#1a1a1a;min-width:20px;text-align:right">${vistosDisc[d]||0}</div></div>`).join('')}</div>
+  <div style="font-size:11px;color:#bbb;text-align:center;padding:4px">Dados salvos localmente para ${currentUser}</div>`;
+  if(cad.length>0&&Object.keys(questoesPorDisc).length>0){
+    const labels=Object.keys(questoesPorDisc);
+    const vals=labels.map(d=>questoesPorDisc[d]);
+    const colors=labels.map((_,i)=>DISC_CHART_COLORS[i%DISC_CHART_COLORS.length]);
+    analyticsChart=new Chart(document.getElementById('chart-disc'),{
+      type:'bar',
+      data:{labels,datasets:[{label:'Questões',data:vals,backgroundColor:colors,borderRadius:4,borderSkipped:false}]},
+      options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{stepSize:1,color:'#aaa',font:{size:11}}},y:{grid:{display:false},ticks:{color:'#666',font:{size:11}}}}}
+    });
+  }
+}
+
+// Inicializa
+renderLoginUsers();
+</script>
+</body>
+</html>
