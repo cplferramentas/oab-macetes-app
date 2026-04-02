@@ -11,68 +11,172 @@
   }
 }
 
-@layer components {
-  .app-shell {
-    @apply w-full max-w-app mx-auto bg-white border border-black/10 rounded-2xl overflow-hidden min-h-[90vh] flex flex-col shadow-lg;
-  }
-  .hdr {
-    @apply p-3 border-b border-black/8 flex-shrink-0 bg-white;
-  }
-  .hdr-row {
-    @apply flex items-center gap-2;
-  }
-  .back-btn {
-    @apply bg-transparent border border-black/12 rounded-lg px-2.5 py-1 text-xs text-gray-500 cursor-pointer font-[inherit] whitespace-nowrap hover:bg-surface;
-  }
-  .htitle {
-    @apply text-sm font-semibold text-gray-900;
-  }
-  .hsub {
-    @apply text-xs text-gray-400 mt-px;
-  }
-  .scrollable {
-    @apply flex-1 overflow-y-auto p-3 flex flex-col gap-2;
-  }
-  .card {
-    @apply bg-white border border-black/10 rounded-xl p-3;
-  }
-  .kw-pill {
-    @apply bg-brand-light text-[#085041] px-2 py-0.5 rounded-full text-xs font-semibold inline-block;
-  }
-  .gerar-btn {
-    @apply bg-brand text-white border-none rounded-lg p-3 text-sm font-semibold cursor-pointer font-[inherit] flex-shrink-0 transition-colors hover:bg-brand-dark disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed;
-  }
-  .alt-btn {
-    @apply border border-black/10 rounded-lg px-3 py-2 cursor-pointer flex gap-2 items-start bg-white text-left font-[inherit] text-sm text-gray-700 w-full transition-colors hover:enabled:bg-surface;
-  }
-  .alt-btn.correct { @apply border-brand-light-border bg-brand-light text-[#085041]; }
-  .alt-btn.wrong   { @apply border-error-border bg-error-bg text-error-text; }
-  .result-bar {
-    @apply rounded-lg p-3 flex items-center gap-2;
-  }
-  .result-bar.ac { @apply bg-brand-light border border-brand-light-border; }
-  .result-bar.er { @apply bg-error-bg border border-error-border; }
-  .badge {
-    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold;
-  }
-  .badge-urg  { @apply bg-error-light text-error; }
-  .badge-soon { @apply bg-warn-light text-warn; }
-  .badge-ok   { @apply bg-brand-light text-brand-dark; }
-  .badge-done { @apply bg-gray-100 text-gray-400; }
-  .badge-disc { @apply bg-purple-light text-purple-dark; }
-  .login-input {
-    @apply w-full px-3 py-2.5 text-sm border-[1.5px] border-gray-200 rounded-[9px] bg-white text-gray-900 font-[inherit] outline-none transition-colors focus:border-brand;
-  }
-  .login-btn {
-    @apply w-full py-3 bg-brand text-white border-none rounded-[9px] text-sm font-bold cursor-pointer font-[inherit] transition-colors hover:bg-brand-dark disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed;
-  }
+/* ── Shared component classes (plain CSS — sem @apply com valores arbitrários) ── */
+
+.app-shell {
+  width: 100%;
+  max-width: 430px;
+  margin-left: auto;
+  margin-right: auto;
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 1rem;
+  overflow: hidden;
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08);
 }
 
-@keyframes spin {
-  to { transform: rotate(360deg); }
+.hdr {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  flex-shrink: 0;
+  background: #fff;
 }
+.hdr-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.htitle { font-size: 0.9375rem; font-weight: 600; color: #111827; }
+.hsub   { font-size: 0.75rem; color: #9ca3af; margin-top: 1px; }
+
+.back-btn {
+  background: transparent;
+  border: 1px solid rgba(0,0,0,0.12);
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.625rem;
+  font-size: 0.75rem;
+  color: #6b7280;
+  cursor: pointer;
+  font-family: inherit;
+  white-space: nowrap;
+}
+.back-btn:hover { background: #f5f5f0; }
+
+.scrollable {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.card {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+}
+
+.kw-pill {
+  background: #E1F5EE;
+  color: #085041;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.gerar-btn {
+  background: #1D9E75;
+  color: #fff;
+  border: none;
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  flex-shrink: 0;
+  transition: background 0.15s;
+  width: 100%;
+}
+.gerar-btn:hover             { background: #0F6E56; }
+.gerar-btn:disabled          { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
+
+.alt-btn {
+  border: 1px solid rgba(0,0,0,0.1);
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  cursor: pointer;
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  background: #fff;
+  text-align: left;
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: #374151;
+  width: 100%;
+  transition: background 0.12s;
+}
+.alt-btn:hover:not(:disabled) { background: #f5f5f0; }
+.alt-btn.correct { border-color: #5DCAA5; background: #E1F5EE; color: #085041; }
+.alt-btn.wrong   { border-color: #F0997B; background: #FAECE7; color: #4A1B0C; }
+
+.result-bar {
+  border-radius: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.result-bar.ac { background: #E1F5EE; border: 1px solid #5DCAA5; }
+.result-bar.er { background: #FAECE7; border: 1px solid #F0997B; }
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.6875rem;
+  font-weight: 600;
+}
+.badge-urg  { background: #FCEBEB; color: #A32D2D; }
+.badge-soon { background: #FAEEDA; color: #854F0B; }
+.badge-ok   { background: #E1F5EE; color: #0F6E56; }
+.badge-done { background: #f3f4f6; color: #9ca3af; }
+.badge-disc { background: #EEEDFE; color: #3C3489; }
+
+.login-input {
+  width: 100%;
+  padding: 0.6875rem 0.8125rem;
+  font-size: 0.875rem;
+  border: 1.5px solid #e5e7eb;
+  border-radius: 9px;
+  background: #fff;
+  color: #111827;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.login-input:focus { border-color: #1D9E75; }
+
+.login-btn {
+  width: 100%;
+  padding: 0.8125rem;
+  background: #1D9E75;
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  font-size: 0.875rem;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.login-btn:hover    { background: #0F6E56; }
+.login-btn:disabled { background: #e5e7eb; color: #9ca3af; cursor: not-allowed; }
+
+/* ── Spinner ── */
+@keyframes spin { to { transform: rotate(360deg); } }
 .spinner {
-  width: 24px; height: 24px;
+  width: 24px;
+  height: 24px;
   border: 2.5px solid #e0e0e0;
   border-top-color: #1D9E75;
   border-radius: 50%;
