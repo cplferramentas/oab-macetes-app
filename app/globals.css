@@ -1,0 +1,80 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #f5f5f0;
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .app-shell {
+    @apply w-full max-w-app mx-auto bg-white border border-black/10 rounded-2xl overflow-hidden min-h-[90vh] flex flex-col shadow-lg;
+  }
+  .hdr {
+    @apply p-3 border-b border-black/8 flex-shrink-0 bg-white;
+  }
+  .hdr-row {
+    @apply flex items-center gap-2;
+  }
+  .back-btn {
+    @apply bg-transparent border border-black/12 rounded-lg px-2.5 py-1 text-xs text-gray-500 cursor-pointer font-[inherit] whitespace-nowrap hover:bg-surface;
+  }
+  .htitle {
+    @apply text-sm font-semibold text-gray-900;
+  }
+  .hsub {
+    @apply text-xs text-gray-400 mt-px;
+  }
+  .scrollable {
+    @apply flex-1 overflow-y-auto p-3 flex flex-col gap-2;
+  }
+  .card {
+    @apply bg-white border border-black/10 rounded-xl p-3;
+  }
+  .kw-pill {
+    @apply bg-brand-light text-[#085041] px-2 py-0.5 rounded-full text-xs font-semibold inline-block;
+  }
+  .gerar-btn {
+    @apply bg-brand text-white border-none rounded-lg p-3 text-sm font-semibold cursor-pointer font-[inherit] flex-shrink-0 transition-colors hover:bg-brand-dark disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed;
+  }
+  .alt-btn {
+    @apply border border-black/10 rounded-lg px-3 py-2 cursor-pointer flex gap-2 items-start bg-white text-left font-[inherit] text-sm text-gray-700 w-full transition-colors hover:enabled:bg-surface;
+  }
+  .alt-btn.correct { @apply border-brand-light-border bg-brand-light text-[#085041]; }
+  .alt-btn.wrong   { @apply border-error-border bg-error-bg text-error-text; }
+  .result-bar {
+    @apply rounded-lg p-3 flex items-center gap-2;
+  }
+  .result-bar.ac { @apply bg-brand-light border border-brand-light-border; }
+  .result-bar.er { @apply bg-error-bg border border-error-border; }
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold;
+  }
+  .badge-urg  { @apply bg-error-light text-error; }
+  .badge-soon { @apply bg-warn-light text-warn; }
+  .badge-ok   { @apply bg-brand-light text-brand-dark; }
+  .badge-done { @apply bg-gray-100 text-gray-400; }
+  .badge-disc { @apply bg-purple-light text-purple-dark; }
+  .login-input {
+    @apply w-full px-3 py-2.5 text-sm border-[1.5px] border-gray-200 rounded-[9px] bg-white text-gray-900 font-[inherit] outline-none transition-colors focus:border-brand;
+  }
+  .login-btn {
+    @apply w-full py-3 bg-brand text-white border-none rounded-[9px] text-sm font-bold cursor-pointer font-[inherit] transition-colors hover:bg-brand-dark disabled:bg-gray-200 disabled:text-gray-400 disabled:cursor-not-allowed;
+  }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  width: 24px; height: 24px;
+  border: 2.5px solid #e0e0e0;
+  border-top-color: #1D9E75;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
