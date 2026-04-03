@@ -11,32 +11,21 @@ interface Props { macete: Macete }
 
 export default function MaceteClient({ macete }: Props) {
   const [questao, setQuestao] = useState<Questao | null>(null)
-  const [loading, setLoading] = useState(false)
   const [respondido, setRespondido] = useState(false)
   const [escolha, setEscolha] = useState<string | null>(null)
   const [error, setError] = useState('')
   const supabase = createClient()
 
-  async function gerarQuestao() {
-    setLoading(true)
-    setQuestao(null)
+  function gerarQuestao() {
     setRespondido(false)
     setEscolha(null)
     setError('')
-    try {
-      const res = await fetch('/api/gerar-questao', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ macete }),
-      })
-      if (!res.ok) throw new Error('Falha na geração')
-      const data: Questao = await res.json()
-      setQuestao(data)
-    } catch {
-      setError('Erro ao gerar questão. Tente novamente.')
-    } finally {
-      setLoading(false)
+    if (!macete.questoes || macete.questoes.length === 0) {
+      setError('Nenhuma questão disponível para este macete.')
+      return
     }
+    const idx = Math.floor(Math.random() * macete.questoes.length)
+    setQuestao(macete.questoes[idx])
   }
 
   async function responder(letra: string) {
@@ -108,17 +97,10 @@ export default function MaceteClient({ macete }: Props) {
         </div>
 
         {/* Question section */}
-        {!questao && !loading && (
+        {!questao && (
           <button onClick={gerarQuestao} className="gerar-btn">
-            ✦ Gerar questão estilo OAB
+            ✦ Praticar com questão estilo OAB
           </button>
-        )}
-
-        {loading && (
-          <div className="flex items-center gap-3 p-4">
-            <div className="spinner" />
-            <span className="text-sm text-gray-400">Criando questão no estilo FGV...</span>
-          </div>
         )}
 
         {error && (

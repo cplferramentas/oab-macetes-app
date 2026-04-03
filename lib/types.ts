@@ -1,13 +1,3 @@
-export interface Macete {
-  num: number
-  disc: string
-  title: string
-  kw: string
-  exp: string
-  ex: string
-  peg: string
-}
-
 export interface Alternativa {
   letra: string
   texto: string
@@ -18,6 +8,17 @@ export interface Questao {
   alternativas: Alternativa[]
   correta: string
   gabarito: string
+}
+
+export interface Macete {
+  num: number
+  disc: string
+  title: string
+  kw: string
+  exp: string
+  ex: string
+  peg: string
+  questoes: Questao[]
 }
 
 export interface EntradaCaderno {
