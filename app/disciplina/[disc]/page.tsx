@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { createClient } from '@/lib/supabase/server'
 import { fetchSeen } from '@/lib/supabase/data'
 import { MACETES } from '@/lib/macetes'
@@ -45,7 +47,7 @@ export default async function DisciplinaPage({ params }: Props) {
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="kw-pill">{m.kw}</span>
                 {seen[m.num] && (
-                  <span className="text-[10px] text-brand font-semibold">✓ visto</span>
+                  <span className="text-[10px] text-[#1D9E75] font-semibold">✓ visto</span>
                 )}
               </div>
             </div>

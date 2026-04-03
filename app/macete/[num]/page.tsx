@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { createClient } from '@/lib/supabase/server'
 import { markSeen } from '@/lib/supabase/data'
 import { MACETES } from '@/lib/macetes'
@@ -19,9 +21,4 @@ export default async function MacetePage({ params }: Props) {
   if (user) await markSeen(supabase, user.id, num)
 
   return <MaceteClient macete={macete} />
-}
-
-// Pre-generate all macete routes at build time
-export function generateStaticParams() {
-  return MACETES.map(m => ({ num: String(m.num) }))
 }
