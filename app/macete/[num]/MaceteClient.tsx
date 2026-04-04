@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import type { Macete, Questao } from '@/lib/types'
+import { MACETES } from '@/lib/macetes'
 import { createClient } from '@/lib/supabase/client'
 import { upsertCaderno } from '@/lib/supabase/data'
 import BottomNav from '@/components/BottomNav'
@@ -56,6 +57,9 @@ export default function MaceteClient({ macete }: Props) {
   }
 
   const disc = encodeURIComponent(macete.disc)
+  const currentIdx = MACETES.findIndex(m => m.num === macete.num)
+  const nextMacete = MACETES[currentIdx + 1] ?? MACETES[0]
+  const nextHref = `/macete/${nextMacete.num}`
 
   return (
     <div className="app-shell">
@@ -165,12 +169,12 @@ export default function MaceteClient({ macete }: Props) {
                   <Link href={`/disciplina/${disc}`} className="flex-1 py-2.5 text-xs text-center cursor-pointer border border-black/12 rounded-lg bg-transparent text-gray-500 font-[inherit] no-underline flex items-center justify-center">
                     ← ver disciplina
                   </Link>
-                  <button
-                    onClick={gerarQuestao}
-                    className="flex-1 py-2.5 text-xs cursor-pointer border border-black/12 rounded-lg bg-transparent text-gray-500 font-[inherit]"
+                  <Link
+                    href={nextHref}
+                    className="flex-1 py-2.5 text-xs text-center cursor-pointer border border-black/12 rounded-lg bg-transparent text-gray-500 font-[inherit] no-underline flex items-center justify-center"
                   >
-                    ↺ nova questão
-                  </button>
+                    próximo macete →
+                  </Link>
                 </div>
               </>
             )}
