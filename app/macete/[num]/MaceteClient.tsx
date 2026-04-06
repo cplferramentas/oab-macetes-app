@@ -70,34 +70,34 @@ export default function MaceteClient({ macete }: Props) {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-3.5 flex flex-col gap-3">
+      <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4">
         {/* Title */}
-        <h1 className="text-[17px] font-bold text-gray-900 leading-snug">{macete.title}</h1>
+        <h1 className="text-[22px] font-bold text-gray-900 leading-snug">{macete.title}</h1>
 
         {/* Explanation */}
-        <div className="border border-black/10 rounded-lg p-3">
-          <div className="text-[11px] text-gray-300 uppercase tracking-wider mb-1 font-semibold">Explicação</div>
-          <p className="text-sm text-gray-600 leading-relaxed">{macete.exp}</p>
+        <div className="border border-black/10 rounded-lg p-4">
+          <div className="text-[12px] text-gray-300 uppercase tracking-wider mb-1.5 font-semibold">Explicação</div>
+          <p className="text-[17px] text-gray-600 leading-[1.7]">{macete.exp}</p>
         </div>
 
         {/* Example */}
-        <div className="border border-black/10 rounded-lg p-3">
-          <div className="text-[11px] text-gray-300 uppercase tracking-wider mb-1 font-semibold">Exemplo prático</div>
-          <p className="text-sm text-gray-600 leading-relaxed">{macete.ex}</p>
+        <div className="border border-black/10 rounded-lg p-4">
+          <div className="text-[12px] text-gray-300 uppercase tracking-wider mb-1.5 font-semibold">Exemplo prático</div>
+          <p className="text-[17px] text-gray-600 leading-[1.7]">{macete.ex}</p>
         </div>
 
         {/* Keyword */}
         <div>
-          <div className="text-[11px] text-gray-300 uppercase tracking-wider mb-1.5 font-semibold">Palavra-chave</div>
-          <span className="text-sm font-bold text-brand-dark bg-brand-light px-3.5 py-2 rounded-lg inline-block">
+          <div className="text-[12px] text-gray-300 uppercase tracking-wider mb-2 font-semibold">Palavra-chave</div>
+          <span className="text-base font-bold text-brand-dark bg-brand-light px-4 py-2.5 rounded-lg inline-block">
             {macete.kw}
           </span>
         </div>
 
         {/* Pegadinha */}
-        <div className="border border-warn-border bg-warn-light rounded-lg p-3">
-          <div className="text-[11px] text-warn uppercase tracking-wider mb-1 font-semibold">⚠ Pegadinha FGV</div>
-          <p className="text-sm text-warn leading-relaxed">{macete.peg}</p>
+        <div className="border border-warn-border bg-warn-light rounded-lg p-4">
+          <div className="text-[12px] text-warn uppercase tracking-wider mb-1.5 font-semibold">⚠ Pegadinha FGV</div>
+          <p className="text-[17px] text-warn leading-[1.7]">{macete.peg}</p>
         </div>
 
         {/* Question section */}
@@ -108,18 +108,18 @@ export default function MaceteClient({ macete }: Props) {
         )}
 
         {error && (
-          <div className="text-sm text-error-dark bg-error-bg border border-error-border rounded-lg p-3">
+          <div className="text-[17px] text-error-dark bg-error-bg border border-error-border rounded-lg p-4">
             {error}
           </div>
         )}
 
         {questao && (
-          <div className="flex flex-col gap-3">
-            <div className="bg-gray-50 border border-black/10 rounded-lg p-3 text-sm text-gray-700 leading-relaxed">
+          <div className="flex flex-col gap-4">
+            <div className="bg-gray-50 border border-black/10 rounded-lg p-4 text-[18px] text-gray-700 leading-[1.7]">
               {questao.enunciado}
             </div>
 
-            <div className="flex flex-col gap-1.5">
+            <div className="flex flex-col gap-2">
               {questao.alternativas.map(a => {
                 let cls = 'alt-btn'
                 if (respondido) {
@@ -133,7 +133,7 @@ export default function MaceteClient({ macete }: Props) {
                     disabled={respondido}
                     onClick={() => responder(a.letra)}
                   >
-                    <span className="font-bold min-w-[18px]">{a.letra})</span>
+                    <span className="font-bold min-w-[22px]">{a.letra})</span>
                     <span>{a.texto}</span>
                   </button>
                 )
@@ -143,35 +143,36 @@ export default function MaceteClient({ macete }: Props) {
             {respondido && (
               <>
                 <div className={`result-bar ${escolha === questao.correta ? 'ac' : 'er'}`}>
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 ${escolha === questao.correta ? 'bg-brand-light-border' : 'bg-error-border'}`}>
-                    <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 ${escolha === questao.correta ? 'bg-brand-light-border' : 'bg-error-border'}`}>
+                    <svg width="16" height="16" viewBox="0 0 14 14" fill="none">
                       {escolha === questao.correta
                         ? <path d="M3 7l3 3 5-5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
                         : <path d="M4 4l6 6M10 4l-6 6" stroke="white" strokeWidth="1.8" strokeLinecap="round" />}
                     </svg>
                   </div>
                   <div>
-                    <div className={`text-sm font-semibold ${escolha === questao.correta ? 'text-[#085041]' : 'text-error-dark'}`}>
+                    <div className={`text-[17px] font-semibold ${escolha === questao.correta ? 'text-[#085041]' : 'text-error-dark'}`}>
                       {escolha === questao.correta ? 'Acertou!' : 'Errou! Adicionado ao caderno.'}
                     </div>
-                    <div className={`text-xs mt-px ${escolha === questao.correta ? 'text-brand-dark' : 'text-error-dark2'}`}>
+                    <div className={`text-[15px] mt-0.5 ${escolha === questao.correta ? 'text-brand-dark' : 'text-error-dark2'}`}>
                       {escolha === questao.correta ? 'Continue assim!' : 'Revisão agendada para 2 dias.'}
                     </div>
                   </div>
                 </div>
 
-                <div className="border border-black/10 rounded-lg p-3">
-                  <div className="text-[11px] text-gray-300 uppercase tracking-wider mb-1.5 font-semibold">Gabarito comentado</div>
-                  <p className="text-sm text-gray-600 leading-relaxed">{questao.gabarito}</p>
+                <div className="border border-black/10 rounded-lg p-4">
+                  <div className="text-[12px] text-gray-300 uppercase tracking-wider mb-2 font-semibold">Gabarito comentado</div>
+                  <p className="text-[17px] text-gray-600 leading-[1.7]">{questao.gabarito}</p>
                 </div>
 
                 <div className="flex gap-2">
-                  <Link href={`/disciplina/${disc}`} className="flex-1 py-2.5 text-xs text-center cursor-pointer border border-black/12 rounded-lg bg-transparent text-gray-500 font-[inherit] no-underline flex items-center justify-center">
+                  <Link href={`/disciplina/${disc}`} className="flex-1 text-[16px] text-center cursor-pointer border border-black/12 rounded-lg bg-transparent text-gray-500 font-[inherit] no-underline flex items-center justify-center" style={{minHeight:'52px'}}>
                     ← ver disciplina
                   </Link>
                   <Link
                     href={nextHref}
-                    className="flex-1 py-2.5 text-xs text-center cursor-pointer border border-black/12 rounded-lg bg-transparent text-gray-500 font-[inherit] no-underline flex items-center justify-center"
+                    className="flex-1 text-[16px] text-center cursor-pointer border border-black/12 rounded-lg bg-transparent text-gray-500 font-[inherit] no-underline flex items-center justify-center"
+                    style={{minHeight:'52px'}}
                   >
                     próximo macete →
                   </Link>
